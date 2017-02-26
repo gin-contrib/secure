@@ -1,3 +1,23 @@
+# secure
+
+## Example
+
+See the [example](example/example.go).
+
+DefaultConfig returns a Configuration with strict security settings
+
+```
+SSLRedirect:           true
+IsDevelopment: 		   false
+STSSeconds:            315360000
+STSIncludeSubdomains:  true
+FrameDeny:             true
+ContentTypeNosniff:    true
+BrowserXssFilter:      true
+ContentSecurityPolicy: "default-src 'self'"
+```
+
+```go
 package main
 
 import (
@@ -27,3 +47,6 @@ func main() {
 	// Listen and Server in 0.0.0.0:8080
 	router.Run()
 }
+
+
+```

@@ -1,6 +1,6 @@
 package secure
 
-import "github.com/gin-gonic/gin"
+import "gopkg.in/gin-gonic/gin.v1"
 
 // Options is a struct for specifying configuration options for the secure.
 type Config struct {
