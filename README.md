@@ -1,4 +1,6 @@
-# secure
+# Secure
+
+Secure meddleware for [Gin][https://github.com/gin-gonic/gin/] framework.
 
 ## Example
 
@@ -8,7 +10,7 @@ DefaultConfig returns a Configuration with strict security settings
 
 ```
 SSLRedirect:           true
-IsDevelopment: 		   false
+IsDevelopment: 	       false
 STSSeconds:            315360000
 STSIncludeSubdomains:  true
 FrameDeny:             true
