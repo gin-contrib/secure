@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/gin-gonic/gin.v1"
 )
 
 const (
@@ -110,7 +110,8 @@ func TestAllowHostsInDevMode(t *testing.T) {
 func TestBadHostHandler(t *testing.T) {
 
 	badHandler := func(c *gin.Context) {
-		http.Error(c.Writer, "BadHost", http.StatusInternalServerError)
+		c.String(http.StatusInternalServerError, "BadHost")
+		c.Abort()
 	}
 
 	router := newServer(Config{
@@ -120,8 +121,8 @@ func TestBadHostHandler(t *testing.T) {
 
 	w := performRequest(router, "http://www3.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusInternalServerError)
-	assert.Equal(t, w.Body.String(), "BadHost\n")
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, "BadHost", w.Body.String())
 }
 
 func TestSSL(t *testing.T) {

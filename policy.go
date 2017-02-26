@@ -115,10 +115,12 @@ func (p *policy) checkAllowHosts(c *gin.Context) bool {
 		}
 	}
 
-	c.AbortWithStatus(403)
 	if p.config.BadHostHandler != nil {
 		p.config.BadHostHandler(c)
+	} else {
+		c.AbortWithStatus(403)
 	}
+
 	return false
 }
 
