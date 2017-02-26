@@ -1,6 +1,6 @@
 # Secure
 
-Secure meddleware for [Gin][https://github.com/gin-gonic/gin/] framework.
+Secure meddleware for [Gin](https://github.com/gin-gonic/gin/) framework.
 
 ## Example
 
