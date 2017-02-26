@@ -2,7 +2,7 @@ package secure
 
 import "gopkg.in/gin-gonic/gin.v1"
 
-// Options is a struct for specifying configuration options for the secure.
+// Config is a struct for specifying configuration options for the secure.
 type Config struct {
 	// AllowedHosts is a list of fully qualified domain names that are allowed.
 	//Default is empty list, which allows any and all host names.
@@ -49,8 +49,8 @@ type Config struct {
 
 // DefaultConfig returns a Configuration with strict security settings.
 // ```
-//		SSLRedirect:   true
-//		IsDevelopment: false
+//		SSLRedirect:           true
+//		IsDevelopment:         false
 //		STSSeconds:            315360000
 //		STSIncludeSubdomains:  true
 //		FrameDeny:             true
@@ -60,15 +60,15 @@ type Config struct {
 // ```
 func DefaultConfig() Config {
 	return Config{
-		SSLRedirect:   true,
-		IsDevelopment: false,
-		//SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+		SSLRedirect:           true,
+		IsDevelopment:         false,
 		STSSeconds:            315360000,
 		STSIncludeSubdomains:  true,
 		FrameDeny:             true,
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
 		ContentSecurityPolicy: "default-src 'self'",
+		//SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	}
 }
 
