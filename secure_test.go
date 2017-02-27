@@ -40,8 +40,22 @@ func TestNoConfig(t *testing.T) {
 
 	w := performRequest(router, "http://example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Body.String(), "bar")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "bar", w.Body.String())
+}
+
+func TestDefaultConfig(t *testing.T) {
+	router := newServer(DefaultConfig())
+
+	w := performRequest(router, "https://www.example.com/foo")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "bar", w.Body.String())
+
+	w = performRequest(router, "http://www.example.com/foo")
+
+	assert.Equal(t, http.StatusMovedPermanently, w.Code)
+	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
 }
 
 func TestNoAllowHosts(t *testing.T) {
@@ -51,8 +65,8 @@ func TestNoAllowHosts(t *testing.T) {
 
 	w := performRequest(router, "http://www.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Body.String(), "bar")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "bar", w.Body.String())
 }
 
 func TestGoodSingleAllowHosts(t *testing.T) {
@@ -62,8 +76,8 @@ func TestGoodSingleAllowHosts(t *testing.T) {
 
 	w := performRequest(router, "http://www.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Body.String(), "bar")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "bar", w.Body.String())
 }
 
 func TestBadSingleAllowHosts(t *testing.T) {
@@ -73,7 +87,7 @@ func TestBadSingleAllowHosts(t *testing.T) {
 
 	w := performRequest(router, "http://www.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusForbidden)
+	assert.Equal(t, http.StatusForbidden, w.Code)
 }
 
 func TestGoodMultipleAllowHosts(t *testing.T) {
@@ -83,8 +97,8 @@ func TestGoodMultipleAllowHosts(t *testing.T) {
 
 	w := performRequest(router, "http://sub.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Body.String(), "bar")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "bar", w.Body.String())
 }
 
 func TestBadMultipleAllowHosts(t *testing.T) {
@@ -94,7 +108,7 @@ func TestBadMultipleAllowHosts(t *testing.T) {
 
 	w := performRequest(router, "http://www3.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusForbidden)
+	assert.Equal(t, http.StatusForbidden, w.Code)
 }
 func TestAllowHostsInDevMode(t *testing.T) {
 	router := newServer(Config{
@@ -104,7 +118,7 @@ func TestAllowHostsInDevMode(t *testing.T) {
 
 	w := performRequest(router, "http://www3.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
+	assert.Equal(t, http.StatusOK, w.Code)
 }
 
 func TestBadHostHandler(t *testing.T) {
@@ -132,8 +146,8 @@ func TestSSL(t *testing.T) {
 
 	w := performRequest(router, "https://www.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Body.String(), "bar")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "bar", w.Body.String())
 }
 
 func TestSSLInDevMode(t *testing.T) {
@@ -144,8 +158,8 @@ func TestSSLInDevMode(t *testing.T) {
 
 	w := performRequest(router, "http://www.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Body.String(), "bar")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "bar", w.Body.String())
 }
 
 func TestBasicSSL(t *testing.T) {
@@ -155,8 +169,8 @@ func TestBasicSSL(t *testing.T) {
 
 	w := performRequest(router, "http://www.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusMovedPermanently)
-	assert.Equal(t, w.Header().Get("Location"), "https://www.example.com/foo")
+	assert.Equal(t, http.StatusMovedPermanently, w.Code)
+	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
 }
 
 func TestBasicSSLWithHost(t *testing.T) {
@@ -167,8 +181,8 @@ func TestBasicSSLWithHost(t *testing.T) {
 
 	w := performRequest(router, "http://www.example.com/foo")
 
-	assert.Equal(t, w.Code, http.StatusMovedPermanently)
-	assert.Equal(t, w.Header().Get("Location"), "https://secure.example.com/foo")
+	assert.Equal(t, http.StatusMovedPermanently, w.Code)
+	assert.Equal(t, "https://secure.example.com/foo", w.Header().Get("Location"))
 }
 
 func TestBadProxySSL(t *testing.T) {
@@ -184,8 +198,8 @@ func TestBadProxySSL(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, w.Code, http.StatusMovedPermanently)
-	assert.Equal(t, w.Header().Get("Location"), "https://www.example.com/foo")
+	assert.Equal(t, http.StatusMovedPermanently, w.Code)
+	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
 }
 
 func TestStsHeader(t *testing.T) {
@@ -195,8 +209,8 @@ func TestStsHeader(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("Strict-Transport-Security"), "max-age=315360000")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "max-age=315360000", w.Header().Get("Strict-Transport-Security"))
 }
 
 func TestStsHeaderInDevMode(t *testing.T) {
@@ -207,8 +221,8 @@ func TestStsHeaderInDevMode(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("Strict-Transport-Security"), "")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "", w.Header().Get("Strict-Transport-Security"))
 }
 
 func TestStsHeaderWithSubdomain(t *testing.T) {
@@ -219,8 +233,8 @@ func TestStsHeaderWithSubdomain(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("Strict-Transport-Security"), "max-age=315360000; includeSubdomains")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "max-age=315360000; includeSubdomains", w.Header().Get("Strict-Transport-Security"))
 }
 
 func TestFrameDeny(t *testing.T) {
@@ -230,8 +244,8 @@ func TestFrameDeny(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("X-Frame-Options"), "DENY")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "DENY", w.Header().Get("X-Frame-Options"))
 }
 
 func TestCustomFrameValue(t *testing.T) {
@@ -241,8 +255,8 @@ func TestCustomFrameValue(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("X-Frame-Options"), "SAMEORIGIN")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "SAMEORIGIN", w.Header().Get("X-Frame-Options"))
 }
 
 func TestCustomFrameValueWithDeny(t *testing.T) {
@@ -253,8 +267,8 @@ func TestCustomFrameValueWithDeny(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("X-Frame-Options"), "SAMEORIGIN")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "SAMEORIGIN", w.Header().Get("X-Frame-Options"))
 }
 
 func TestContentNosniff(t *testing.T) {
@@ -264,8 +278,8 @@ func TestContentNosniff(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("X-Content-Type-Options"), "nosniff")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "nosniff", w.Header().Get("X-Content-Type-Options"))
 }
 
 func TestXSSProtection(t *testing.T) {
@@ -275,8 +289,8 @@ func TestXSSProtection(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("X-XSS-Protection"), "1; mode=block")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "1; mode=block", w.Header().Get("X-XSS-Protection"))
 }
 
 func TestCsp(t *testing.T) {
@@ -286,8 +300,8 @@ func TestCsp(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("Content-Security-Policy"), "default-src 'self'")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "default-src 'self'", w.Header().Get("Content-Security-Policy"))
 }
 
 func TestInlineSecure(t *testing.T) {
@@ -297,6 +311,6 @@ func TestInlineSecure(t *testing.T) {
 
 	w := performRequest(router, "/foo")
 
-	assert.Equal(t, w.Code, http.StatusOK)
-	assert.Equal(t, w.Header().Get("X-Frame-Options"), "DENY")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "DENY", w.Header().Get("X-Frame-Options"))
 }

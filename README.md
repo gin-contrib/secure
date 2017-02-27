@@ -1,5 +1,10 @@
 # Secure
 
+[![Build Status](https://travis-ci.org/gin-contrib/secure.svg)](https://travis-ci.org/gin-contrib/secure)
+[![codecov](https://codecov.io/gh/gin-contrib/secure/branch/master/graph/badge.svg)](https://codecov.io/gh/gin-contrib/secure)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gin-contrib/secure)](https://goreportcard.com/report/github.com/gin-contrib/secure)
+[![GoDoc](https://godoc.org/github.com/gin-contrib/secure?status.svg)](https://godoc.org/github.com/gin-contrib/secure)
+
 Secure meddleware for [Gin](https://github.com/gin-gonic/gin/) framework.
 
 ## Example
