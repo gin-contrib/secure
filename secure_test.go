@@ -44,6 +44,20 @@ func TestNoConfig(t *testing.T) {
 	assert.Equal(t, w.Body.String(), "bar")
 }
 
+func TestDefaultConfig(t *testing.T) {
+	router := newServer(DefaultConfig())
+
+	w := performRequest(router, "https://www.example.com/foo")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, w.Body.String(), "bar")
+
+	w = performRequest(router, "http://www.example.com/foo")
+
+	assert.Equal(t, http.StatusMovedPermanently, w.Code)
+	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
+}
+
 func TestNoAllowHosts(t *testing.T) {
 	router := newServer(Config{
 		AllowedHosts: []string{},
