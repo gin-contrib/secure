@@ -13,17 +13,24 @@ See the [example](example/example.go).
 
 DefaultConfig returns a Configuration with strict security settings
 
-```
-SSLRedirect:           true
-IsDevelopment: 	       false
-STSSeconds:            315360000
-STSIncludeSubdomains:  true
-FrameDeny:             true
-ContentTypeNosniff:    true
-BrowserXssFilter:      true
-ContentSecurityPolicy: "default-src 'self'"
+[embedmd]:# (secure.go go /func DefaultConfig/ /^}$/)
+```go
+func DefaultConfig() Config {
+	return Config{
+		SSLRedirect:           true,
+		IsDevelopment:         false,
+		STSSeconds:            315360000,
+		STSIncludeSubdomains:  true,
+		FrameDeny:             true,
+		ContentTypeNosniff:    true,
+		BrowserXssFilter:      true,
+		ContentSecurityPolicy: "default-src 'self'",
+		//SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+	}
+}
 ```
 
+[embedmd]:# (example/code1/example.go go)
 ```go
 package main
 
@@ -54,6 +61,4 @@ func main() {
 	// Listen and Server in 0.0.0.0:8080
 	router.Run()
 }
-
-
 ```
