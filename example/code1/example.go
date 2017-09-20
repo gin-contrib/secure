@@ -18,7 +18,7 @@ func main() {
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
 		ContentSecurityPolicy: "default-src 'self'",
-		CustomReferrerPolicy:  "strict-origin-when-cross-origin",
+		ReferrerPolicy:  "strict-origin-when-cross-origin",
 	}))
 
 	router.GET("/ping", func(c *gin.Context) {
