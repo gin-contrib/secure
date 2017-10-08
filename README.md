@@ -25,6 +25,7 @@ func DefaultConfig() Config {
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
 		ContentSecurityPolicy: "default-src 'self'",
+		IENoOpen:              true,
 		//SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	}
 }
@@ -51,6 +52,7 @@ func main() {
 		FrameDeny:             true,
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
+		IENoOpen:              true,
 		ContentSecurityPolicy: "default-src 'self'",
 	}))
 
