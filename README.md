@@ -52,8 +52,8 @@ func main() {
 		FrameDeny:             true,
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
-		IENoOpen:              true,
 		ContentSecurityPolicy: "default-src 'self'",
+		IENoOpen:              true,
 	}))
 
 	router.GET("/ping", func(c *gin.Context) {
