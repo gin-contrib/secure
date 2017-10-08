@@ -42,6 +42,8 @@ type Config struct {
 	IsDevelopment bool
 	// Handlers for when an error occurs (ie bad host).
 	BadHostHandler gin.HandlerFunc
+	// Prevent Internet Explorer from executing downloads in your site’s context
+	IENoOpen bool
 
 	// TODO
 	// SSLProxyHeaders map[string]string
@@ -68,6 +70,7 @@ func DefaultConfig() Config {
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
 		ContentSecurityPolicy: "default-src 'self'",
+		IENoOpen:              true,
 		//SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	}
 }

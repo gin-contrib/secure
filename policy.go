@@ -69,6 +69,11 @@ func (p *policy) loadConfig(config Config) {
 			"Strict-Transport-Security",
 			fmt.Sprintf("max-age=%d%s", config.STSSeconds, stsSub))
 	}
+
+	// X-Download-Options header.
+	if config.IENoOpen {
+		p.addHeader("X-Download-Options", "noopen")
+	}
 }
 
 func (p *policy) addHeader(key string, value string) {
