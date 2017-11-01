@@ -20,6 +20,7 @@ func main() {
 		ContentSecurityPolicy: "default-src 'self'",
 		ReferrerPolicy:        "strict-origin-when-cross-origin",
 		IENoOpen:              true,
+		ReferrerPolicy:        "strict-origin-when-cross-origin",
 	}))
 
 	router.GET("/ping", func(c *gin.Context) {
