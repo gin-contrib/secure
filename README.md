@@ -52,6 +52,7 @@ func main() {
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
 		ContentSecurityPolicy: "default-src 'self'",
+		ReferrerPolicy:  "strict-origin-when-cross-origin",
 	}))
 
 	router.GET("/ping", func(c *gin.Context) {

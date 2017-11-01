@@ -37,6 +37,8 @@ type Config struct {
 	// ContentSecurityPolicy allows the Content-Security-Policy header value
 	// to be set with a custom value. Default is "".
 	ContentSecurityPolicy string
+	// HTTP header "Referrer-Policy" governs which referrer information, sent in the Referrer header, should be included with requests made.
+	ReferrerPolicy string
 	// When true, the whole secury policy applied by the middleware is disable
 	// completely.
 	IsDevelopment bool

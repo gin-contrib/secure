@@ -293,6 +293,17 @@ func TestXSSProtection(t *testing.T) {
 	assert.Equal(t, "1; mode=block", w.Header().Get("X-XSS-Protection"))
 }
 
+func TestReferrerPolicy(t *testing.T) {
+	router := newServer(Config{
+		ReferrerPolicy: "strict-origin-when-cross-origin",
+	})
+
+	w := performRequest(router, "/foo")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "strict-origin-when-cross-origin", w.Header().Get("Referrer-Policy"))
+}
+
 func TestCsp(t *testing.T) {
 	router := newServer(Config{
 		ContentSecurityPolicy: "default-src 'self'",

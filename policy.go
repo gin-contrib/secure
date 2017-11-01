@@ -56,6 +56,10 @@ func (p *policy) loadConfig(config Config) {
 		p.addHeader("Content-Security-Policy", config.ContentSecurityPolicy)
 	}
 
+	if len(config.ReferrerPolicy) > 0 {
+		p.addHeader("Referrer-Policy", config.ReferrerPolicy)
+	}
+
 	// Strict Transport Security header.
 	if config.STSSeconds != 0 {
 		stsSub := ""
