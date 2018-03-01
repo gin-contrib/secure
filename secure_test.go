@@ -202,6 +202,41 @@ func TestBadProxySSL(t *testing.T) {
 	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
 }
 
+func TestProxySSLWithHeaderOption(t *testing.T) {
+	router := newServer(Config{
+		SSLRedirect: true,
+		SSLProxyHeaders: map[string]string{"X-Arbitrary-Header": "arbitrary-value"},
+	})
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/foo", nil)
+	req.Host = "www.example.com"
+	req.URL.Scheme = "http"
+	req.Header.Add("X-Arbitrary-Header", "arbitrary-value")
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestProxySSLWithWrongHeaderValue(t *testing.T) {
+	router := newServer(Config{
+		SSLRedirect: true,
+		SSLProxyHeaders: map[string]string{"X-Arbitrary-Header": "arbitrary-value"},
+	})
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/foo", nil)
+	req.Host = "www.example.com"
+	req.URL.Scheme = "http"
+	req.Header.Add("X-Arbitrary-Header", "wrong-value")
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusMovedPermanently, w.Code)
+	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
+}
+
 func TestStsHeader(t *testing.T) {
 	router := newServer(Config{
 		STSSeconds: 315360000,

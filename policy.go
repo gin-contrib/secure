@@ -133,13 +133,33 @@ func (p *policy) checkAllowHosts(c *gin.Context) bool {
 	return false
 }
 
+func (p *policy) isSSLRequest(req *http.Request) bool {
+	if strings.EqualFold(req.URL.Scheme, "https") || req.TLS != nil {
+		return true
+	}
+
+	for h, v := range p.config.SSLProxyHeaders {
+		hv, ok := req.Header[h]
+
+		if !ok {
+			continue
+		}
+		
+		if strings.EqualFold(hv[0], v) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p *policy) checkSSL(c *gin.Context) bool {
 	if !p.config.SSLRedirect {
 		return true
 	}
 
 	req := c.Request
-	isSSLRequest := strings.EqualFold(req.URL.Scheme, "https") || req.TLS != nil
+	isSSLRequest := p.isSSLRequest(req)
 	if isSSLRequest {
 		return true
 	}
