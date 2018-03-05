@@ -62,6 +62,7 @@ type Config struct {
 //		ContentTypeNosniff:    true
 //		BrowserXssFilter:      true
 //		ContentSecurityPolicy: "default-src 'self'"
+//      SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 // ```
 func DefaultConfig() Config {
 	return Config{
