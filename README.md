@@ -26,7 +26,7 @@ func DefaultConfig() Config {
 		BrowserXssFilter:      true,
 		ContentSecurityPolicy: "default-src 'self'",
 		IENoOpen:              true,
-		//SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	}
 }
 ```
@@ -56,6 +56,7 @@ func main() {
 		ReferrerPolicy:        "strict-origin-when-cross-origin",
 		IENoOpen:              true,
 		ReferrerPolicy:        "strict-origin-when-cross-origin",
+		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	}))
 
 	router.GET("/ping", func(c *gin.Context) {
