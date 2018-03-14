@@ -47,8 +47,9 @@ type Config struct {
 	// Prevent Internet Explorer from executing downloads in your site’s context
 	IENoOpen bool
 
-	// TODO
-	// SSLProxyHeaders map[string]string
+	// If the request is insecure, treat it as secure if any of the headers in this dict are set to their corresponding value
+	// This is useful when your app is running behind a secure proxy that forwards requests to your app over http (such as on Heroku).
+	SSLProxyHeaders map[string]string
 }
 
 // DefaultConfig returns a Configuration with strict security settings.
@@ -61,6 +62,7 @@ type Config struct {
 //		ContentTypeNosniff:    true
 //		BrowserXssFilter:      true
 //		ContentSecurityPolicy: "default-src 'self'"
+//      SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 // ```
 func DefaultConfig() Config {
 	return Config{
@@ -73,7 +75,7 @@ func DefaultConfig() Config {
 		BrowserXssFilter:      true,
 		ContentSecurityPolicy: "default-src 'self'",
 		IENoOpen:              true,
-		//SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	}
 }
 
