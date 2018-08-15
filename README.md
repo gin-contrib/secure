@@ -9,7 +9,7 @@ Secure meddleware for [Gin](https://github.com/gin-gonic/gin/) framework.
 
 ## Example
 
-See the [example](example/example.go).
+See the [example1](example/code1/example.go), [example2](example/code2/example.go).
 
 DefaultConfig returns a Configuration with strict security settings
 
