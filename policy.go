@@ -78,6 +78,11 @@ func (p *policy) loadConfig(config Config) {
 	if config.IENoOpen {
 		p.addHeader("X-Download-Options", "noopen")
 	}
+
+	// FeaturePolicy header.
+	if len(config.FeaturePolicy) > 0 {
+		p.addHeader("Feature-Policy", config.FeaturePolicy)
+	}
 }
 
 func (p *policy) addHeader(key string, value string) {
@@ -144,7 +149,7 @@ func (p *policy) isSSLRequest(req *http.Request) bool {
 		if !ok {
 			continue
 		}
-		
+
 		if strings.EqualFold(hv[0], v) {
 			return true
 		}
