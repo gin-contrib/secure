@@ -35,7 +35,7 @@ func performRequest(router *gin.Engine, path string) *httptest.ResponseRecorder 
 
 func TestNoConfig(t *testing.T) {
 	router := newServer(Config{
-	// Intentionally left blank.
+		// Intentionally left blank.
 	})
 
 	w := performRequest(router, "http://example.com/foo")
@@ -204,7 +204,7 @@ func TestBadProxySSL(t *testing.T) {
 
 func TestProxySSLWithHeaderOption(t *testing.T) {
 	router := newServer(Config{
-		SSLRedirect: true,
+		SSLRedirect:     true,
 		SSLProxyHeaders: map[string]string{"X-Arbitrary-Header": "arbitrary-value"},
 	})
 
@@ -221,7 +221,7 @@ func TestProxySSLWithHeaderOption(t *testing.T) {
 
 func TestProxySSLWithWrongHeaderValue(t *testing.T) {
 	router := newServer(Config{
-		SSLRedirect: true,
+		SSLRedirect:     true,
 		SSLProxyHeaders: map[string]string{"X-Arbitrary-Header": "arbitrary-value"},
 	})
 
@@ -337,6 +337,17 @@ func TestReferrerPolicy(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "strict-origin-when-cross-origin", w.Header().Get("Referrer-Policy"))
+}
+
+func TestFeaturePolicy(t *testing.T) {
+	router := newServer(Config{
+		FeaturePolicy: "vibrate 'none';",
+	})
+
+	w := performRequest(router, "/foo")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "vibrate 'none';", w.Header().Get("Feature-Policy"))
 }
 
 func TestCsp(t *testing.T) {

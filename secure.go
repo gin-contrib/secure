@@ -46,6 +46,8 @@ type Config struct {
 	BadHostHandler gin.HandlerFunc
 	// Prevent Internet Explorer from executing downloads in your site’s context
 	IENoOpen bool
+	// Feature Policy is a new header that allows a site to control which features and APIs can be used in the browser.
+	FeaturePolicy string
 
 	// If the request is insecure, treat it as secure if any of the headers in this dict are set to their corresponding value
 	// This is useful when your app is running behind a secure proxy that forwards requests to your app over http (such as on Heroku).
