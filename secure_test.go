@@ -371,3 +371,12 @@ func TestInlineSecure(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "DENY", w.Header().Get("X-Frame-Options"))
 }
+
+func TestIsIpv4Host(t *testing.T) {
+	assert.Equal(t, isIPV4("127.0.0.1"), true)
+	assert.Equal(t, isIPV4("127.0.0.1:8080"), true)
+	assert.Equal(t, isIPV4("localhost"), false)
+	assert.Equal(t, isIPV4("localhost:8080"), false)
+	assert.Equal(t, isIPV4("example.com"), false)
+	assert.Equal(t, isIPV4("example.com:8080"), false)
+}

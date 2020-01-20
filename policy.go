@@ -2,6 +2,7 @@ package secure
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 
@@ -136,6 +137,15 @@ func (p *policy) checkAllowHosts(c *gin.Context) bool {
 	}
 
 	return false
+}
+
+// checks if a host (possibly with trailing port) is an IPV4 address
+func isIPV4(host string) bool {
+	index := strings.IndexByte(host, ':')
+		if index != -1 {
+		host = host[:index]
+	}
+	return net.ParseIP(host) != nil
 }
 
 func (p *policy) isSSLRequest(req *http.Request) bool {
