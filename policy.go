@@ -165,6 +165,10 @@ func (p *policy) isSSLRequest(req *http.Request) bool {
 		}
 	}
 
+	if p.config.DontRedirectIPV4Hostnames && isIPV4(req.Host) {
+		return true
+	}
+
 	return false
 }
 

@@ -173,6 +173,19 @@ func TestBasicSSL(t *testing.T) {
 	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
 }
 
+func TestDontRedirectIPV4Hostnames(t *testing.T) {
+	router := newServer(Config{
+		SSLRedirect: true,
+		DontRedirectIPV4Hostnames: true,
+	})
+
+	w1 := performRequest(router, "http://www.example.com/foo")
+	assert.Equal(t, http.StatusMovedPermanently, w1.Code)
+
+	w2 := performRequest(router, "http://127.0.0.1/foo")
+	assert.Equal(t, http.StatusOK, w2.Code)
+}
+
 func TestBasicSSLWithHost(t *testing.T) {
 	router := newServer(Config{
 		SSLRedirect: true,
