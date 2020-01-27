@@ -2,6 +2,7 @@ package secure
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 
@@ -138,6 +139,14 @@ func (p *policy) checkAllowHosts(c *gin.Context) bool {
 	return false
 }
 
+// checks if a host (possibly with trailing port) is an IPV4 address
+func isIPV4(host string) bool {
+	if index := strings.IndexByte(host, ':'); index != -1 {
+		host = host[:index]
+	}
+	return net.ParseIP(host) != nil
+}
+
 func (p *policy) isSSLRequest(req *http.Request) bool {
 	if strings.EqualFold(req.URL.Scheme, "https") || req.TLS != nil {
 		return true
@@ -153,6 +162,10 @@ func (p *policy) isSSLRequest(req *http.Request) bool {
 		if strings.EqualFold(hv[0], v) {
 			return true
 		}
+	}
+
+	if p.config.DontRedirectIPV4Hostnames && isIPV4(req.Host) {
+		return true
 	}
 
 	return false

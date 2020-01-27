@@ -48,6 +48,10 @@ type Config struct {
 	IENoOpen bool
 	// Feature Policy is a new header that allows a site to control which features and APIs can be used in the browser.
 	FeaturePolicy string
+	// If DontRedirectIPV4Hostnames is true, requests to hostnames that are IPV4
+	// addresses aren't redirected. This is to allow load balancer health checks
+	// to succeed.
+	DontRedirectIPV4Hostnames bool
 
 	// If the request is insecure, treat it as secure if any of the headers in this dict are set to their corresponding value
 	// This is useful when your app is running behind a secure proxy that forwards requests to your app over http (such as on Heroku).
