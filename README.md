@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/gin-contrib/secure)](https://goreportcard.com/report/github.com/gin-contrib/secure)
 [![GoDoc](https://godoc.org/github.com/gin-contrib/secure?status.svg)](https://godoc.org/github.com/gin-contrib/secure)
 
-Secure meddleware for [Gin](https://github.com/gin-gonic/gin/) framework.
+Secure middleware for [Gin](https://github.com/gin-gonic/gin/) framework.
 
 ## Example
 
