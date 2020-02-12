@@ -39,8 +39,7 @@ type Config struct {
 	ContentSecurityPolicy string
 	// HTTP header "Referrer-Policy" governs which referrer information, sent in the Referrer header, should be included with requests made.
 	ReferrerPolicy string
-	// When true, the whole secury policy applied by the middleware is disable
-	// completely.
+	// When true, the whole security policy applied by the middleware is disabled completely.
 	IsDevelopment bool
 	// Handlers for when an error occurs (ie bad host).
 	BadHostHandler gin.HandlerFunc
@@ -68,7 +67,7 @@ type Config struct {
 //		ContentTypeNosniff:    true
 //		BrowserXssFilter:      true
 //		ContentSecurityPolicy: "default-src 'self'"
-//      SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+//		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 // ```
 func DefaultConfig() Config {
 	return Config{
