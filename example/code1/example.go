@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-contrib/secure"
 	"github.com/gin-gonic/gin"
 )
@@ -28,5 +30,7 @@ func main() {
 	})
 
 	// Listen and Server in 0.0.0.0:8080
-	router.Run()
+	if err := router.Run(); err != nil {
+		log.Fatal(err)
+	}
 }

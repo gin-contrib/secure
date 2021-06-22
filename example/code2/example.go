@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-contrib/secure"
 	"github.com/gin-gonic/gin"
 )
@@ -17,5 +19,7 @@ func main() {
 		c.String(200, "pong")
 	})
 
-	router.Run()
+	if err := router.Run(); err != nil {
+		log.Fatal(err)
+	}
 }
