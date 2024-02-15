@@ -1,6 +1,6 @@
-module github.com/gin-contrib/secure
+module github.com/GswOne/secure
 
-go 1.18
+go 1.22
 
 require (
 	github.com/gin-gonic/gin v1.9.1
