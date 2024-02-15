@@ -80,6 +80,7 @@ func DefaultConfig() Config {
 		IsDevelopment:         false,
 		STSSeconds:            315360000,
 		STSIncludeSubdomains:  true,
+		STSPreload:            true,
 		FrameDeny:             true,
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
