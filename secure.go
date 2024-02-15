@@ -22,6 +22,11 @@ type Config struct {
 	// If STSIncludeSubdomains is set to true, the `includeSubdomains` will
 	// be appended to the Strict-Transport-Security header. Default is false.
 	STSIncludeSubdomains bool
+        // If STSPreload is set to true, the `; preload` will be appended to the
+        // Strict-Transport-Security header. Default is false.
+        // Note that removal is non-trivial and enabling this means you need to
+        // support https long-term. See https://hstspreload.org/ for more info.
+        STSPreload bool
 	// If FrameDeny is set to true, adds the X-Frame-Options header with
 	// the value of `DENY`. Default is false.
 	FrameDeny bool
