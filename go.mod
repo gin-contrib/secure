@@ -1,4 +1,4 @@
-module github.com/gin-contrib/secure
+module github.com/GswOne/secure
 
 go 1.18
 
