@@ -2,13 +2,14 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-contrib/secure"
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
-	router := gin.Default()
+	router := chi.NewRouter()
 
 	router.Use(secure.New(secure.Config{
 		AllowedHosts:          []string{"example.com", "ssl.example.com"},
@@ -25,12 +26,14 @@ func main() {
 		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	}))
 
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(200, "pong")
+	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("pong"))
 	})
 
 	// Listen and Server in 0.0.0.0:8080
-	if err := router.Run(); err != nil {
+	server := &http.Server{Handler: router}
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }

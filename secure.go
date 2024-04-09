@@ -1,6 +1,8 @@
 package secure
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+)
 
 // Config is a struct for specifying configuration options for the secure.
 type Config struct {
@@ -42,7 +44,7 @@ type Config struct {
 	// When true, the whole security policy applied by the middleware is disabled completely.
 	IsDevelopment bool
 	// Handlers for when an error occurs (ie bad host).
-	BadHostHandler gin.HandlerFunc
+	BadHostHandler http.HandlerFunc
 	// Prevent Internet Explorer from executing downloads in your site’s context
 	IENoOpen bool
 	// Feature Policy is a new header that allows a site to control which features and APIs can be used in the browser.
@@ -59,15 +61,17 @@ type Config struct {
 
 // DefaultConfig returns a Configuration with strict security settings.
 // ```
-//		SSLRedirect:           true
-//		IsDevelopment:         false
-//		STSSeconds:            315360000
-//		STSIncludeSubdomains:  true
-//		FrameDeny:             true
-//		ContentTypeNosniff:    true
-//		BrowserXssFilter:      true
-//		ContentSecurityPolicy: "default-src 'self'"
-//		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+//
+//	SSLRedirect:           true
+//	IsDevelopment:         false
+//	STSSeconds:            315360000
+//	STSIncludeSubdomains:  true
+//	FrameDeny:             true
+//	ContentTypeNosniff:    true
+//	BrowserXssFilter:      true
+//	ContentSecurityPolicy: "default-src 'self'"
+//	SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+//
 // ```
 func DefaultConfig() Config {
 	return Config{
@@ -86,11 +90,15 @@ func DefaultConfig() Config {
 
 // New creates an instance of the secure middleware using the specified configuration.
 // router.Use(secure.N)
-func New(config Config) gin.HandlerFunc {
+func New(config Config) func(http.Handler) http.Handler {
 	policy := newPolicy(config)
-	return func(c *gin.Context) {
-		if !policy.applyToContext(c) {
-			return
-		}
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			if !policy.apply(res, req) {
+				return
+			}
+
+			next.ServeHTTP(res, req)
+		})
 	}
 }

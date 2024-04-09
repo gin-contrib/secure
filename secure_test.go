@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,20 +13,18 @@ const (
 	testResponse = "bar"
 )
 
-func init() {
-	gin.SetMode(gin.TestMode)
-}
-
-func newServer(options Config) *gin.Engine {
-	router := gin.New()
+func newServer(options Config) chi.Router {
+	router := chi.NewRouter()
 	router.Use(New(options))
-	router.GET("/foo", func(c *gin.Context) {
-		c.String(200, testResponse)
+	router.Get("/foo", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(testResponse))
 	})
+
 	return router
 }
 
-func performRequest(router *gin.Engine, path string) *httptest.ResponseRecorder {
+func performRequest(router chi.Router, path string) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", path, nil)
 	router.ServeHTTP(w, req)
@@ -122,11 +120,11 @@ func TestAllowHostsInDevMode(t *testing.T) {
 }
 
 func TestBadHostHandler(t *testing.T) {
-
-	badHandler := func(c *gin.Context) {
-		c.String(http.StatusInternalServerError, "BadHost")
-		c.Abort()
-	}
+	badHandler := http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte("BadHost"))
+		return
+	})
 
 	router := newServer(Config{
 		AllowedHosts:   []string{"www.example.com", "sub.example.com"},
@@ -175,7 +173,7 @@ func TestBasicSSL(t *testing.T) {
 
 func TestDontRedirectIPV4Hostnames(t *testing.T) {
 	router := newServer(Config{
-		SSLRedirect: true,
+		SSLRedirect:               true,
 		DontRedirectIPV4Hostnames: true,
 	})
 

@@ -5,8 +5,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
 type (
@@ -93,35 +91,35 @@ func (p *policy) addHeader(key string, value string) {
 	})
 }
 
-func (p *policy) applyToContext(c *gin.Context) bool {
+func (p *policy) apply(res http.ResponseWriter, req *http.Request) bool {
 	if !p.config.IsDevelopment {
-		p.writeSecureHeaders(c)
+		p.writeSecureHeaders(res, req)
 
-		if !p.checkAllowHosts(c) {
+		if !p.checkAllowHosts(res, req) {
 			return false
 		}
-		if !p.checkSSL(c) {
+		if !p.checkSSL(res, req) {
 			return false
 		}
 	}
 	return true
 }
 
-func (p *policy) writeSecureHeaders(c *gin.Context) {
-	header := c.Writer.Header()
+func (p *policy) writeSecureHeaders(res http.ResponseWriter, req *http.Request) {
+	header := res.Header()
 	for _, pair := range p.fixedHeaders {
 		header[pair.key] = pair.value
 	}
 }
 
-func (p *policy) checkAllowHosts(c *gin.Context) bool {
+func (p *policy) checkAllowHosts(res http.ResponseWriter, req *http.Request) bool {
 	if len(p.config.AllowedHosts) == 0 {
 		return true
 	}
 
-	host := c.Request.Host
+	host := req.Host
 	if len(host) == 0 {
-		host = c.Request.URL.Host
+		host = req.URL.Host
 	}
 
 	for _, allowedHost := range p.config.AllowedHosts {
@@ -131,9 +129,9 @@ func (p *policy) checkAllowHosts(c *gin.Context) bool {
 	}
 
 	if p.config.BadHostHandler != nil {
-		p.config.BadHostHandler(c)
+		p.config.BadHostHandler(res, req)
 	} else {
-		c.AbortWithStatus(403)
+		res.WriteHeader(http.StatusForbidden)
 	}
 
 	return false
@@ -171,12 +169,11 @@ func (p *policy) isSSLRequest(req *http.Request) bool {
 	return false
 }
 
-func (p *policy) checkSSL(c *gin.Context) bool {
+func (p *policy) checkSSL(res http.ResponseWriter, req *http.Request) bool {
 	if !p.config.SSLRedirect {
 		return true
 	}
 
-	req := c.Request
 	isSSLRequest := p.isSSLRequest(req)
 	if isSSLRequest {
 		return true
@@ -196,7 +193,7 @@ func (p *policy) checkSSL(c *gin.Context) bool {
 	if p.config.SSLTemporaryRedirect {
 		status = http.StatusTemporaryRedirect
 	}
-	c.Redirect(status, url.String())
-	c.Abort()
+
+	http.Redirect(res, req, url.String(), status)
 	return false
 }
