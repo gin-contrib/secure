@@ -67,7 +67,7 @@ func (p *policy) loadConfig(config Config) {
 		if config.STSIncludeSubdomains {
 			stsSub = "; includeSubdomains"
 		}
-                if config.STSPreload {
+		if config.STSPreload {
 			stsSub = "; preload"
 		}
 		// TODO

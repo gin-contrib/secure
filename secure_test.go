@@ -110,6 +110,7 @@ func TestBadMultipleAllowHosts(t *testing.T) {
 
 	assert.Equal(t, http.StatusForbidden, w.Code)
 }
+
 func TestAllowHostsInDevMode(t *testing.T) {
 	router := newServer(Config{
 		AllowedHosts:  []string{"www.example.com", "sub.example.com"},
@@ -122,7 +123,6 @@ func TestAllowHostsInDevMode(t *testing.T) {
 }
 
 func TestBadHostHandler(t *testing.T) {
-
 	badHandler := func(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "BadHost")
 		c.Abort()
@@ -175,7 +175,7 @@ func TestBasicSSL(t *testing.T) {
 
 func TestDontRedirectIPV4Hostnames(t *testing.T) {
 	router := newServer(Config{
-		SSLRedirect: true,
+		SSLRedirect:               true,
 		DontRedirectIPV4Hostnames: true,
 	})
 
