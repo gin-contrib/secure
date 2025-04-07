@@ -42,7 +42,8 @@ type Config struct {
 	// ContentSecurityPolicy allows the Content-Security-Policy header value
 	// to be set with a custom value. Default is "".
 	ContentSecurityPolicy string
-	// HTTP header "Referrer-Policy" governs which referrer information, sent in the Referrer header, should be included with requests made.
+	// HTTP header "Referrer-Policy" governs which referrer information, sent in the Referrer header,
+	// should be included with requests made.
 	ReferrerPolicy string
 	// When true, the whole security policy applied by the middleware is disabled completely.
 	IsDevelopment bool
@@ -57,8 +58,10 @@ type Config struct {
 	// to succeed.
 	DontRedirectIPV4Hostnames bool
 
-	// If the request is insecure, treat it as secure if any of the headers in this dict are set to their corresponding value
-	// This is useful when your app is running behind a secure proxy that forwards requests to your app over http (such as on Heroku).
+	// If the request is insecure, treat it as secure if any of the headers
+	// in this dict are set to their corresponding value.
+	// This is useful when your app is running behind a secure proxy that forwards requests to your app over http
+	// (such as on Heroku).
 	SSLProxyHeaders map[string]string
 }
 

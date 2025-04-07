@@ -1,6 +1,7 @@
 package secure
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,11 +12,9 @@ import (
 
 const (
 	testResponse = "bar"
+	exampleHost  = "www.example.com"
+	httpScheme   = "http"
 )
-
-func init() {
-	gin.SetMode(gin.TestMode)
-}
 
 func newServer(options Config) *gin.Engine {
 	router := gin.New()
@@ -28,7 +27,7 @@ func newServer(options Config) *gin.Engine {
 
 func performRequest(router *gin.Engine, path string) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", path, nil)
+	req, _ := http.NewRequestWithContext(context.Background(), "GET", path, nil)
 	router.ServeHTTP(w, req)
 	return w
 }
@@ -47,12 +46,12 @@ func TestNoConfig(t *testing.T) {
 func TestDefaultConfig(t *testing.T) {
 	router := newServer(DefaultConfig())
 
-	w := performRequest(router, "https://www.example.com/foo")
+	w := performRequest(router, "https://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
 
-	w = performRequest(router, "http://www.example.com/foo")
+	w = performRequest(router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusMovedPermanently, w.Code)
 	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
@@ -63,7 +62,7 @@ func TestNoAllowHosts(t *testing.T) {
 		AllowedHosts: []string{},
 	})
 
-	w := performRequest(router, "http://www.example.com/foo")
+	w := performRequest(router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -71,10 +70,10 @@ func TestNoAllowHosts(t *testing.T) {
 
 func TestGoodSingleAllowHosts(t *testing.T) {
 	router := newServer(Config{
-		AllowedHosts: []string{"www.example.com"},
+		AllowedHosts: []string{exampleHost},
 	})
 
-	w := performRequest(router, "http://www.example.com/foo")
+	w := performRequest(router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -92,7 +91,7 @@ func TestBadSingleAllowHosts(t *testing.T) {
 
 func TestGoodMultipleAllowHosts(t *testing.T) {
 	router := newServer(Config{
-		AllowedHosts: []string{"www.example.com", "sub.example.com"},
+		AllowedHosts: []string{exampleHost, "sub.example.com"},
 	})
 
 	w := performRequest(router, "http://sub.example.com/foo")
@@ -179,7 +178,7 @@ func TestDontRedirectIPV4Hostnames(t *testing.T) {
 		DontRedirectIPV4Hostnames: true,
 	})
 
-	w1 := performRequest(router, "http://www.example.com/foo")
+	w1 := performRequest(router, "http://"+exampleHost+"/foo")
 	assert.Equal(t, http.StatusMovedPermanently, w1.Code)
 
 	w2 := performRequest(router, "http://127.0.0.1/foo")
@@ -192,7 +191,7 @@ func TestBasicSSLWithHost(t *testing.T) {
 		SSLHost:     "secure.example.com",
 	})
 
-	w := performRequest(router, "http://www.example.com/foo")
+	w := performRequest(router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusMovedPermanently, w.Code)
 	assert.Equal(t, "https://secure.example.com/foo", w.Header().Get("Location"))
@@ -204,9 +203,9 @@ func TestBadProxySSL(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/foo", nil)
-	req.Host = "www.example.com"
-	req.URL.Scheme = "http"
+	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/foo", nil)
+	req.Host = exampleHost
+	req.URL.Scheme = httpScheme
 	req.Header.Add("X-Forwarded-Proto", "https")
 
 	router.ServeHTTP(w, req)
@@ -222,8 +221,8 @@ func TestProxySSLWithHeaderOption(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/foo", nil)
-	req.Host = "www.example.com"
+	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/foo", nil)
+	req.Host = exampleHost
 	req.URL.Scheme = "http"
 	req.Header.Add("X-Arbitrary-Header", "arbitrary-value")
 
@@ -239,7 +238,7 @@ func TestProxySSLWithWrongHeaderValue(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/foo", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/foo", nil)
 	req.Host = "www.example.com"
 	req.URL.Scheme = "http"
 	req.Header.Add("X-Arbitrary-Header", "wrong-value")
