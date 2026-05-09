@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	testResponse = "bar"
-	exampleHost  = "www.example.com"
-	httpScheme   = "http"
+	testResponse   = "bar"
+	exampleHost    = "www.example.com"
+	subExampleHost = "sub.example.com"
+	httpScheme     = "http"
 )
 
 func newServer(options Config) *gin.Engine {
@@ -81,7 +82,7 @@ func TestGoodSingleAllowHosts(t *testing.T) {
 
 func TestBadSingleAllowHosts(t *testing.T) {
 	router := newServer(Config{
-		AllowedHosts: []string{"sub.example.com"},
+		AllowedHosts: []string{subExampleHost},
 	})
 
 	w := performRequest(router, "http://www.example.com/foo")
@@ -91,7 +92,7 @@ func TestBadSingleAllowHosts(t *testing.T) {
 
 func TestGoodMultipleAllowHosts(t *testing.T) {
 	router := newServer(Config{
-		AllowedHosts: []string{exampleHost, "sub.example.com"},
+		AllowedHosts: []string{exampleHost, subExampleHost},
 	})
 
 	w := performRequest(router, "http://sub.example.com/foo")
@@ -102,7 +103,7 @@ func TestGoodMultipleAllowHosts(t *testing.T) {
 
 func TestBadMultipleAllowHosts(t *testing.T) {
 	router := newServer(Config{
-		AllowedHosts: []string{"www.example.com", "sub.example.com"},
+		AllowedHosts: []string{exampleHost, subExampleHost},
 	})
 
 	w := performRequest(router, "http://www3.example.com/foo")
@@ -112,7 +113,7 @@ func TestBadMultipleAllowHosts(t *testing.T) {
 
 func TestAllowHostsInDevMode(t *testing.T) {
 	router := newServer(Config{
-		AllowedHosts:  []string{"www.example.com", "sub.example.com"},
+		AllowedHosts:  []string{exampleHost, subExampleHost},
 		IsDevelopment: true,
 	})
 
@@ -128,7 +129,7 @@ func TestBadHostHandler(t *testing.T) {
 	}
 
 	router := newServer(Config{
-		AllowedHosts:   []string{"www.example.com", "sub.example.com"},
+		AllowedHosts:   []string{exampleHost, subExampleHost},
 		BadHostHandler: badHandler,
 	})
 
@@ -239,7 +240,7 @@ func TestProxySSLWithWrongHeaderValue(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/foo", nil)
-	req.Host = "www.example.com"
+	req.Host = exampleHost
 	req.URL.Scheme = "http"
 	req.Header.Add("X-Arbitrary-Header", "wrong-value")
 
