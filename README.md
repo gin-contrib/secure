@@ -3,7 +3,7 @@
 [![Run Tests](https://github.com/gin-contrib/secure/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/gin-contrib/secure/actions/workflows/go.yml)
 [![Trivy Security Scan](https://github.com/gin-contrib/secure/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/gin-contrib/secure/actions/workflows/trivy-scan.yml)
 [![codecov](https://codecov.io/gh/gin-contrib/secure/branch/master/graph/badge.svg)](https://codecov.io/gh/gin-contrib/secure)
-[![GoDoc](https://godoc.org/github.com/gin-contrib/secure?status.svg)](https://godoc.org/github.com/gin-contrib/secure)
+[![Go Reference](https://pkg.go.dev/badge/github.com/gin-contrib/secure.svg)](https://pkg.go.dev/github.com/gin-contrib/secure)
 
 Secure middleware for [Gin](https://github.com/gin-gonic/gin/) framework.
 
