@@ -285,6 +285,19 @@ func TestStsHeaderWithSubdomain(t *testing.T) {
 	assert.Equal(t, "max-age=315360000; includeSubdomains", w.Header().Get("Strict-Transport-Security"))
 }
 
+func TestStsHeaderWithSubdomainAndPreload(t *testing.T) {
+	router := newServer(Config{
+		STSSeconds:           315360000,
+		STSIncludeSubdomains: true,
+		STSPreload:           true,
+	})
+
+	w := performRequest(router, "/foo")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "max-age=315360000; includeSubdomains; preload", w.Header().Get("Strict-Transport-Security"))
+}
+
 func TestFrameDeny(t *testing.T) {
 	router := newServer(Config{
 		FrameDeny: true,
