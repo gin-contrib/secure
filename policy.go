@@ -68,7 +68,7 @@ func (p *policy) loadConfig(config Config) {
 			stsSub = "; includeSubdomains"
 		}
 		if config.STSPreload {
-			stsSub = "; preload"
+			stsSub += "; preload"
 		}
 		// TODO
 		// "max-age=%d%s" refactor
