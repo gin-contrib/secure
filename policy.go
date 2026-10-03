@@ -74,7 +74,8 @@ func (p *policy) loadConfig(config Config) {
 		// "max-age=%d%s" refactor
 		p.addHeader(
 			"Strict-Transport-Security",
-			fmt.Sprintf("max-age=%d%s", config.STSSeconds, stsSub))
+			fmt.Sprintf("max-age=%d%s", config.STSSeconds, stsSub),
+		)
 	}
 
 	// X-Download-Options header.
@@ -88,7 +89,7 @@ func (p *policy) loadConfig(config Config) {
 	}
 }
 
-func (p *policy) addHeader(key string, value string) {
+func (p *policy) addHeader(key, value string) {
 	p.fixedHeaders = append(p.fixedHeaders, header{
 		key:   key,
 		value: []string{value},

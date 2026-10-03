@@ -38,7 +38,7 @@ type Config struct {
 	ContentTypeNosniff bool
 	// If BrowserXssFilter is true, adds the X-XSS-Protection header with
 	// the value `1; mode=block`. Default is false.
-	BrowserXssFilter bool
+	BrowserXssFilter bool //nolint:staticcheck // ST1003: public API field name kept for backward compatibility
 	// ContentSecurityPolicy allows the Content-Security-Policy header value
 	// to be set with a custom value. Default is "".
 	ContentSecurityPolicy string

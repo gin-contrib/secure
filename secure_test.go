@@ -28,7 +28,7 @@ func newServer(options Config) *gin.Engine {
 
 func performRequest(router *gin.Engine, path string) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), "GET", path, nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 	router.ServeHTTP(w, req)
 	return w
 }
@@ -204,7 +204,7 @@ func TestBadProxySSL(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/foo", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/foo", nil)
 	req.Host = exampleHost
 	req.URL.Scheme = httpScheme
 	req.Header.Add("X-Forwarded-Proto", "https")
@@ -222,7 +222,7 @@ func TestProxySSLWithHeaderOption(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/foo", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/foo", nil)
 	req.Host = exampleHost
 	req.URL.Scheme = "http"
 	req.Header.Add("X-Arbitrary-Header", "arbitrary-value")
@@ -239,7 +239,7 @@ func TestProxySSLWithWrongHeaderValue(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), "GET", "/foo", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/foo", nil)
 	req.Host = exampleHost
 	req.URL.Scheme = "http"
 	req.Header.Add("X-Arbitrary-Header", "wrong-value")
@@ -270,7 +270,7 @@ func TestStsHeaderInDevMode(t *testing.T) {
 	w := performRequest(router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, "", w.Header().Get("Strict-Transport-Security"))
+	assert.Empty(t, w.Header().Get("Strict-Transport-Security"))
 }
 
 func TestStsHeaderWithSubdomain(t *testing.T) {
@@ -282,7 +282,11 @@ func TestStsHeaderWithSubdomain(t *testing.T) {
 	w := performRequest(router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, "max-age=315360000; includeSubdomains", w.Header().Get("Strict-Transport-Security"))
+	assert.Equal(
+		t,
+		"max-age=315360000; includeSubdomains",
+		w.Header().Get("Strict-Transport-Security"),
+	)
 }
 
 func TestFrameDeny(t *testing.T) {
@@ -386,10 +390,10 @@ func TestInlineSecure(t *testing.T) {
 }
 
 func TestIsIpv4Host(t *testing.T) {
-	assert.Equal(t, isIPV4("127.0.0.1"), true)
-	assert.Equal(t, isIPV4("127.0.0.1:8080"), true)
-	assert.Equal(t, isIPV4("localhost"), false)
-	assert.Equal(t, isIPV4("localhost:8080"), false)
-	assert.Equal(t, isIPV4("example.com"), false)
-	assert.Equal(t, isIPV4("example.com:8080"), false)
+	assert.True(t, isIPV4("127.0.0.1"))
+	assert.True(t, isIPV4("127.0.0.1:8080"))
+	assert.False(t, isIPV4("localhost"))
+	assert.False(t, isIPV4("localhost:8080"))
+	assert.False(t, isIPV4("example.com"))
+	assert.False(t, isIPV4("example.com:8080"))
 }
