@@ -144,9 +144,7 @@ func (p *policy) checkAllowHosts(c *gin.Context) bool {
 
 // checks if a host (possibly with trailing port) is an IPV4 address
 func isIPV4(host string) bool {
-	if index := strings.IndexByte(host, ':'); index != -1 {
-		host = host[:index]
-	}
+	host, _, _ = strings.Cut(host, ":")
 	return net.ParseIP(host) != nil
 }
 

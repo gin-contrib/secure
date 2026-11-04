@@ -1,7 +1,6 @@
 package secure
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,9 +25,9 @@ func newServer(options Config) *gin.Engine {
 	return router
 }
 
-func performRequest(router *gin.Engine, path string) *httptest.ResponseRecorder {
+func performRequest(t testing.TB, router *gin.Engine, path string) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
+	req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, path, nil)
 	router.ServeHTTP(w, req)
 	return w
 }
@@ -38,7 +37,7 @@ func TestNoConfig(t *testing.T) {
 		// Intentionally left blank.
 	})
 
-	w := performRequest(router, "http://example.com/foo")
+	w := performRequest(t, router, "http://example.com/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -47,12 +46,12 @@ func TestNoConfig(t *testing.T) {
 func TestDefaultConfig(t *testing.T) {
 	router := newServer(DefaultConfig())
 
-	w := performRequest(router, "https://"+exampleHost+"/foo")
+	w := performRequest(t, router, "https://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
 
-	w = performRequest(router, "http://"+exampleHost+"/foo")
+	w = performRequest(t, router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusMovedPermanently, w.Code)
 	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
@@ -63,7 +62,7 @@ func TestNoAllowHosts(t *testing.T) {
 		AllowedHosts: []string{},
 	})
 
-	w := performRequest(router, "http://"+exampleHost+"/foo")
+	w := performRequest(t, router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -74,7 +73,7 @@ func TestGoodSingleAllowHosts(t *testing.T) {
 		AllowedHosts: []string{exampleHost},
 	})
 
-	w := performRequest(router, "http://"+exampleHost+"/foo")
+	w := performRequest(t, router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -85,7 +84,7 @@ func TestBadSingleAllowHosts(t *testing.T) {
 		AllowedHosts: []string{subExampleHost},
 	})
 
-	w := performRequest(router, "http://www.example.com/foo")
+	w := performRequest(t, router, "http://www.example.com/foo")
 
 	assert.Equal(t, http.StatusForbidden, w.Code)
 }
@@ -95,7 +94,7 @@ func TestGoodMultipleAllowHosts(t *testing.T) {
 		AllowedHosts: []string{exampleHost, subExampleHost},
 	})
 
-	w := performRequest(router, "http://sub.example.com/foo")
+	w := performRequest(t, router, "http://sub.example.com/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -106,7 +105,7 @@ func TestBadMultipleAllowHosts(t *testing.T) {
 		AllowedHosts: []string{exampleHost, subExampleHost},
 	})
 
-	w := performRequest(router, "http://www3.example.com/foo")
+	w := performRequest(t, router, "http://www3.example.com/foo")
 
 	assert.Equal(t, http.StatusForbidden, w.Code)
 }
@@ -117,7 +116,7 @@ func TestAllowHostsInDevMode(t *testing.T) {
 		IsDevelopment: true,
 	})
 
-	w := performRequest(router, "http://www3.example.com/foo")
+	w := performRequest(t, router, "http://www3.example.com/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }
@@ -133,7 +132,7 @@ func TestBadHostHandler(t *testing.T) {
 		BadHostHandler: badHandler,
 	})
 
-	w := performRequest(router, "http://www3.example.com/foo")
+	w := performRequest(t, router, "http://www3.example.com/foo")
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	assert.Equal(t, "BadHost", w.Body.String())
@@ -144,7 +143,7 @@ func TestSSL(t *testing.T) {
 		SSLRedirect: true,
 	})
 
-	w := performRequest(router, "https://www.example.com/foo")
+	w := performRequest(t, router, "https://www.example.com/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -156,7 +155,7 @@ func TestSSLInDevMode(t *testing.T) {
 		IsDevelopment: true,
 	})
 
-	w := performRequest(router, "http://www.example.com/foo")
+	w := performRequest(t, router, "http://www.example.com/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "bar", w.Body.String())
@@ -167,7 +166,7 @@ func TestBasicSSL(t *testing.T) {
 		SSLRedirect: true,
 	})
 
-	w := performRequest(router, "http://www.example.com/foo")
+	w := performRequest(t, router, "http://www.example.com/foo")
 
 	assert.Equal(t, http.StatusMovedPermanently, w.Code)
 	assert.Equal(t, "https://www.example.com/foo", w.Header().Get("Location"))
@@ -179,10 +178,10 @@ func TestDontRedirectIPV4Hostnames(t *testing.T) {
 		DontRedirectIPV4Hostnames: true,
 	})
 
-	w1 := performRequest(router, "http://"+exampleHost+"/foo")
+	w1 := performRequest(t, router, "http://"+exampleHost+"/foo")
 	assert.Equal(t, http.StatusMovedPermanently, w1.Code)
 
-	w2 := performRequest(router, "http://127.0.0.1/foo")
+	w2 := performRequest(t, router, "http://127.0.0.1/foo")
 	assert.Equal(t, http.StatusOK, w2.Code)
 }
 
@@ -192,7 +191,7 @@ func TestBasicSSLWithHost(t *testing.T) {
 		SSLHost:     "secure.example.com",
 	})
 
-	w := performRequest(router, "http://"+exampleHost+"/foo")
+	w := performRequest(t, router, "http://"+exampleHost+"/foo")
 
 	assert.Equal(t, http.StatusMovedPermanently, w.Code)
 	assert.Equal(t, "https://secure.example.com/foo", w.Header().Get("Location"))
@@ -204,7 +203,7 @@ func TestBadProxySSL(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/foo", nil)
+	req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "/foo", nil)
 	req.Host = exampleHost
 	req.URL.Scheme = httpScheme
 	req.Header.Add("X-Forwarded-Proto", "https")
@@ -222,7 +221,7 @@ func TestProxySSLWithHeaderOption(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/foo", nil)
+	req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "/foo", nil)
 	req.Host = exampleHost
 	req.URL.Scheme = "http"
 	req.Header.Add("X-Arbitrary-Header", "arbitrary-value")
@@ -239,7 +238,7 @@ func TestProxySSLWithWrongHeaderValue(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/foo", nil)
+	req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "/foo", nil)
 	req.Host = exampleHost
 	req.URL.Scheme = "http"
 	req.Header.Add("X-Arbitrary-Header", "wrong-value")
@@ -255,7 +254,7 @@ func TestStsHeader(t *testing.T) {
 		STSSeconds: 315360000,
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "max-age=315360000", w.Header().Get("Strict-Transport-Security"))
@@ -267,7 +266,7 @@ func TestStsHeaderInDevMode(t *testing.T) {
 		IsDevelopment: true,
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Empty(t, w.Header().Get("Strict-Transport-Security"))
@@ -279,7 +278,7 @@ func TestStsHeaderWithSubdomain(t *testing.T) {
 		STSIncludeSubdomains: true,
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(
@@ -294,7 +293,7 @@ func TestFrameDeny(t *testing.T) {
 		FrameDeny: true,
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "DENY", w.Header().Get("X-Frame-Options"))
@@ -305,7 +304,7 @@ func TestCustomFrameValue(t *testing.T) {
 		CustomFrameOptionsValue: "SAMEORIGIN",
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "SAMEORIGIN", w.Header().Get("X-Frame-Options"))
@@ -317,7 +316,7 @@ func TestCustomFrameValueWithDeny(t *testing.T) {
 		CustomFrameOptionsValue: "SAMEORIGIN",
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "SAMEORIGIN", w.Header().Get("X-Frame-Options"))
@@ -328,7 +327,7 @@ func TestContentNosniff(t *testing.T) {
 		ContentTypeNosniff: true,
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "nosniff", w.Header().Get("X-Content-Type-Options"))
@@ -339,7 +338,7 @@ func TestXSSProtection(t *testing.T) {
 		BrowserXssFilter: true,
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "1; mode=block", w.Header().Get("X-XSS-Protection"))
@@ -350,7 +349,7 @@ func TestReferrerPolicy(t *testing.T) {
 		ReferrerPolicy: "strict-origin-when-cross-origin",
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "strict-origin-when-cross-origin", w.Header().Get("Referrer-Policy"))
@@ -361,7 +360,7 @@ func TestFeaturePolicy(t *testing.T) {
 		FeaturePolicy: "vibrate 'none';",
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "vibrate 'none';", w.Header().Get("Feature-Policy"))
@@ -372,7 +371,7 @@ func TestCsp(t *testing.T) {
 		ContentSecurityPolicy: "default-src 'self'",
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "default-src 'self'", w.Header().Get("Content-Security-Policy"))
@@ -383,7 +382,7 @@ func TestInlineSecure(t *testing.T) {
 		FrameDeny: true,
 	})
 
-	w := performRequest(router, "/foo")
+	w := performRequest(t, router, "/foo")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "DENY", w.Header().Get("X-Frame-Options"))
